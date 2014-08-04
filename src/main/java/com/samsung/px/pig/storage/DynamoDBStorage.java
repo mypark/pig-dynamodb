@@ -13,17 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mortardata.pig.storage;
+package com.samsung.px.pig.storage;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Queue;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.commons.logging.Log;
@@ -267,9 +261,9 @@ public class DynamoDBStorage extends StoreFunc {
                 throw new IOException("Schema cannot contain duplicated field name. Found duplicated: " + fieldName);
             }
             if (field.getType() == DataType.MAP ||
-                field.getType() == DataType.TUPLE ||
+//                field.getType() == DataType.TUPLE ||
                 field.getType() == DataType.BAG) {
-                throw new IOException("DynamoDBStorage can not store map, tuple, or bag types.  Found one in field name: " + fieldName);
+                throw new IOException("DynamoDBStorage can not store map, or bag types.  Found one in field name: " + fieldName);
             }
             fieldNames.add(fieldName);
         }
@@ -475,6 +469,25 @@ public class DynamoDBStorage extends StoreFunc {
                 break;
             case DataType.MAP:
             case DataType.TUPLE:
+                Tuple listTuple = (Tuple) field;
+
+                if (listTuple.size() > 0) {
+
+                    Collection<String> listOfValues = new ArrayList<String>();
+                    for (int k = 0; k < listTuple.size(); k++) {
+                        String strItem = (String) listTuple.get(k);
+                        int itemLen = strItem.length();
+                        dataSize += itemLen;
+                        dynamoItemSize += itemLen;
+                        listOfValues.add(strItem);
+                    }
+                    dynamoValue = new AttributeValue().withSS(listOfValues);
+
+                } else {
+                    // DynamoDB cannot handle empty strings
+                    reportCounter(DYNAMO_COUNTER_EMPTY_STRING_FIELDS_DISCARDED, 1);
+                }
+                break;
             case DataType.BAG:
                 throw new RuntimeException(
                         "DynamoDBStorage does not support Maps, Tuples or Bags");
@@ -659,10 +672,10 @@ public class DynamoDBStorage extends StoreFunc {
               return true;
             }
 
-            @Override
-            public void cleanupJob(JobContext context) throws IOException {
-              // IGNORE
-            }
+//            @Override
+//            public void cleanupJob(JobContext context) throws IOException {
+//              // IGNORE
+//            }
 
             @Override
             public void setupJob(JobContext context) throws IOException {

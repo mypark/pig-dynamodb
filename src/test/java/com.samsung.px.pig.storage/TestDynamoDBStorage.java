@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mortardata.pig.storage;
+package com.samsung.px.pig.storage;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
@@ -48,7 +48,7 @@ import com.amazonaws.services.dynamodb.model.ScalarAttributeType;
 import com.amazonaws.services.dynamodb.model.TableDescription;
 import com.amazonaws.services.dynamodb.model.WriteRequest;
 import com.google.common.collect.Maps;
-import com.mortardata.pig.storage.DynamoDBStorage.HadoopJobInfo;
+import com.samsung.px.pig.storage.DynamoDBStorage.HadoopJobInfo;
 
 public class TestDynamoDBStorage {
     
@@ -73,7 +73,7 @@ public class TestDynamoDBStorage {
                             .withAttributeType(ScalarAttributeType.N))));
                  
         when(dynamo.describeTable(any(DescribeTableRequest.class))).thenReturn(describeResult);
-        DynamoDBStorage storage = 
+        DynamoDBStorage storage =
                 new DynamoDBStorage(tableName, awsAccessKeyId, awsSecretKey, dynamo, null);
         try {
             storage.checkSchema(schema);

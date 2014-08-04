@@ -1,5 +1,7 @@
 # pig-dynamodb
 
+This is a fork of mortar's code to support Tuples to String Sets.
+
 An Apache Pig storage function for DynamoDB, by [Mortar Data](http://www.mortardata.com).
 
 [![Build Status](https://travis-ci.org/mortardata/pig-dynamodb.svg?branch=master)](https://travis-ci.org/mortardata/pig-dynamodb)
